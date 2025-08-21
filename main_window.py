@@ -1,6 +1,5 @@
 from PySide6.QtWidgets import QMainWindow, QWidget, QVBoxLayout
 
-
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
@@ -15,3 +14,7 @@ class MainWindow(QMainWindow):
     def fixed_size(self):
         self.adjustSize()
         self.setFixedSize(self.width(), self.height())
+
+    def add_widget(self, widget):
+        self.window_layout.addWidget(widget)
+        
