@@ -2,7 +2,7 @@ from PySide6.QtWidgets import QApplication
 from main_window import MainWindow
 from PySide6.QtGui import QIcon
 from scripts.variables import ICON_DIR
-from dysplay import Dysplay
+from dysplays import Dysplay, Calculations
 import ctypes
 import sys
 
@@ -14,6 +14,9 @@ if __name__ == '__main__':
 
     app = QApplication(sys.argv)  # main app instance
     window = MainWindow()  # main window
+
+    calculations = Calculations('2+4')  # create label with text
+    window.add_widget(calculations)  # add label to the window
 
     dysplay = Dysplay()  # custom widget
     window.add_widget(dysplay)  # add widget to window layout
