@@ -3,6 +3,7 @@ from layout.main_window import MainWindow
 from PySide6.QtGui import QIcon
 from scripts.variables import ICON_DIR
 from layout.dysplays import Dysplay, Calculations
+from layout.buttons import Button
 from layout.styles import setup_theme
 import ctypes
 import sys
@@ -23,6 +24,10 @@ if __name__ == '__main__':
 
     dysplay = Dysplay()  # custom widget
     window.add_widget(dysplay)  # add widget to window layout
+
+    #buttons
+    button = Button('test') 
+    window.add_widget(button)
 
     icon = QIcon(str(ICON_DIR))  # load app icon
     app.setWindowIcon(icon)
