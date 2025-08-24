@@ -1,20 +1,23 @@
 from PySide6.QtWidgets import QMainWindow, QWidget, QVBoxLayout
 
 
+# main window class
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
 
-        self.widget = QWidget()  # central widget
-        self.window_layout = QVBoxLayout()  # main layout
+        # central widget and layout
+        self.widget = QWidget()
+        self.window_layout = QVBoxLayout()
         self.widget.setLayout(self.window_layout)
+        self.setCentralWidget(self.widget)
+        self.setWindowTitle('Calculadora')
 
-        self.setCentralWidget(self.widget)  # set central widget
-        self.setWindowTitle('Calculadora')  # window title
-
+    # lock window size after adjusting
     def fixed_size(self):
-        self.adjustSize()  # adjust window to fit content
-        self.setFixedSize(self.width(), self.height())  # lock current size
+        self.adjustSize()
+        self.setFixedSize(self.width(), self.height())
 
-    def add_widget(self, widget):
-        self.window_layout.addWidget(widget)  # add a widget to the layout
+    # add widget to main layout
+    def add_widget(self, widget: QWidget):
+        self.window_layout.addWidget(widget)

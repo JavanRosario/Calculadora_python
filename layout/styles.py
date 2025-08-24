@@ -19,7 +19,7 @@ qss = f"""
 """
 
 
-def setup_theme(app):  # function to apply the dark theme and custom button styles
-    app.setStyleSheet(qdarkstyle.load_stylesheet_pyside6()
-                      )  # apply default dark theme
-    app.setStyleSheet(app.styleSheet() + qss)  # append custom QSS for buttons
+# function to apply the dark theme and custom button styles
+def setup_theme(app):
+    app.setStyleSheet(qdarkstyle.load_stylesheet_pyside6())
+    app.setStyleSheet(app.styleSheet() + qss)

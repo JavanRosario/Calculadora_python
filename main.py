@@ -3,32 +3,37 @@ from layout.main_window import MainWindow
 from PySide6.QtGui import QIcon
 from scripts.variables import ICON_DIR
 from layout.dysplays import Dysplay, Calculations
-from layout.buttons import Button
+from layout.buttons import Button, Grid
 from layout.styles import setup_theme
 import ctypes
 import sys
 
 if __name__ == '__main__':
-    # fix icon bug on windows
+    # fix Windows taskbar icon
     myappid = 'mycompany.myproduct.subproduct.version'
     ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(
-        myappid)  # Windows app ID for taskbar icon fix
+        myappid)
 
-    app = QApplication(sys.argv)  # main app instance
-    window = MainWindow()  # main window
+    # create main application
+    app = QApplication(sys.argv)
+    window = MainWindow()
+
     # applying dark theme
     setup_theme(app)
 
-    calculations = Calculations('2+4')  # create label with text
-    window.add_widget(calculations)  # add label to the window
+    # create label widget
+    calculations = Calculations('2+4')
+    window.add_widget(calculations)
 
-    dysplay = Dysplay()  # custom widget
-    window.add_widget(dysplay)  # add widget to window layout
+    # create input widget
+    dysplay = Dysplay()
+    window.add_widget(dysplay)
 
-    #buttons
-    button = Button('test') 
-    window.add_widget(button)
+    # add grid layout
+    grid = Grid()
+    window.window_layout.addLayout(grid)
 
+    # set app icon
     icon = QIcon(str(ICON_DIR))  # load app icon
     app.setWindowIcon(icon)
     window.setWindowIcon(icon)
