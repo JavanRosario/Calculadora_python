@@ -52,15 +52,18 @@ class Grid(QGridLayout):
                 else:
                     self.addWidget(button, i, j)
 
+                # Custom connection for button click
                 button.clicked.connect(self.dysplay_conection(
                     self.insert_text_in_layout, button))
 
+    # Create slot for signal with arguments
     def dysplay_conection(self, func, *args, **kwargs):
         @Slot()
         def slot():
             func(*args, **kwargs)
         return slot
 
+    # Insert button text into display
     def insert_text_in_layout(self,  button):
         button_text = button.text()
         self.dysplay.insert(button_text)
