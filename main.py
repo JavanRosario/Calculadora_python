@@ -3,6 +3,7 @@ from main_window import MainWindow
 from PySide6.QtGui import QIcon
 from scripts.variables import ICON_DIR
 from dysplays import Dysplay, Calculations
+from styles.styles import setup_theme
 import ctypes
 import sys
 
@@ -14,6 +15,8 @@ if __name__ == '__main__':
 
     app = QApplication(sys.argv)  # main app instance
     window = MainWindow()  # main window
+    # applying dark theme
+    setup_theme(app)
 
     calculations = Calculations('2+4')  # create label with text
     window.add_widget(calculations)  # add label to the window
