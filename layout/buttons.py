@@ -1,8 +1,14 @@
-from PySide6.QtWidgets import QPushButton, QGridLayout
+from typing import TYPE_CHECKING
 from layout.dysplays import Dysplay
+from layout.dysplays import Infos
+from PySide6.QtWidgets import QPushButton, QGridLayout
 from scripts.variables import MEDIUM_FONT
 from PySide6.QtCore import Slot
 from scripts.utils import valid_num
+
+if TYPE_CHECKING:
+    from layout.dysplays import Dysplay
+    from main import Infos
 
 
 # custom button class
@@ -22,7 +28,7 @@ class Button(QPushButton):
 
 # custom grid layout class
 class Grid(QGridLayout):
-    def __init__(self, dysplay: Dysplay, *args, **kwargs):
+    def __init__(self, dysplay: Dysplay, info: Infos, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
         # define grid button layout
@@ -34,10 +40,20 @@ class Grid(QGridLayout):
             ['',  '0', '.', '='],
         ]
         self.dysplay = dysplay
+        self.info = info
+        self._calcs = ''
+        self.calcs = 'teste'
         self.set_grid()
 
-    # setting grid buttons
+    @property
+    def calcs(self):
+        return self._calcs
 
+    @calcs.setter
+    def calcs(self, arg):
+        self._calcs = arg
+
+    # setting grid buttons
     def set_grid(self):
         for i, line in enumerate(self.grid_mask):
             for j, colum in enumerate(line):

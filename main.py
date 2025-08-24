@@ -2,8 +2,8 @@ from PySide6.QtWidgets import QApplication
 from layout.main_window import MainWindow
 from PySide6.QtGui import QIcon
 from scripts.variables import ICON_DIR
-from layout.dysplays import Dysplay, Calculations
-from layout.buttons import Button, Grid
+from layout.dysplays import Dysplay, Infos
+from layout.buttons import Grid
 from layout.styles import setup_theme
 import ctypes
 import sys
@@ -22,15 +22,15 @@ if __name__ == '__main__':
     setup_theme(app)
 
     # create label widget
-    calculations = Calculations('2+4')
-    window.add_widget(calculations)
+    info = Infos('test')
+    window.add_widget(info)
 
     # create input widget
     dysplay = Dysplay()
     window.add_widget(dysplay)
 
     # add grid layout
-    grid = Grid(dysplay)
+    grid = Grid(dysplay, info)
     window.window_layout.addLayout(grid)
 
     # set app icon

@@ -19,7 +19,7 @@ class Dysplay(QLineEdit):
         self.setMinimumWidth(MINIUM_WIDTH)
 
 
-class Calculations(QLabel):
+class Infos(QLabel):
     def __init__(self, text):
         super().__init__(text)
         self.config_calc_style()  # apply style
