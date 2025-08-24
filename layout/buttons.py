@@ -2,6 +2,7 @@ from PySide6.QtWidgets import QPushButton, QGridLayout
 from layout.dysplays import Dysplay
 from scripts.variables import MEDIUM_FONT
 from PySide6.QtCore import Slot
+from scripts.utils import valid_num
 
 
 # custom button class
@@ -66,4 +67,8 @@ class Grid(QGridLayout):
     # Insert button text into display
     def insert_text_in_layout(self,  button):
         button_text = button.text()
+        dysplay_value = self.dysplay.text() + button_text
+
+        if not valid_num(dysplay_value):
+            return
         self.dysplay.insert(button_text)
