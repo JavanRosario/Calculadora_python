@@ -1,5 +1,7 @@
 from PySide6.QtWidgets import QPushButton, QGridLayout
+from layout.dysplays import Dysplay
 from scripts.variables import MEDIUM_FONT
+from PySide6.QtCore import Slot
 
 
 # custom button class
@@ -19,7 +21,7 @@ class Button(QPushButton):
 
 # custom grid layout class
 class Grid(QGridLayout):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, dysplay: Dysplay, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
         # define grid button layout
@@ -30,9 +32,11 @@ class Grid(QGridLayout):
             ['1', '2', '3', '+'],
             ['',  '0', '.', '='],
         ]
+        self.dysplay = dysplay
         self.set_grid()
 
     # setting grid buttons
+
     def set_grid(self):
         for i, line in enumerate(self.grid_mask):
             for j, colum in enumerate(line):
@@ -47,3 +51,16 @@ class Grid(QGridLayout):
                     self.addWidget(button, i, 0, 1, 2)
                 else:
                     self.addWidget(button, i, j)
+
+                button.clicked.connect(self.dysplay_conection(
+                    self.insert_text_in_layout, button))
+
+    def dysplay_conection(self, func, *args, **kwargs):
+        @Slot()
+        def slot():
+            func(*args, **kwargs)
+        return slot
+
+    def insert_text_in_layout(self,  button):
+        button_text = button.text()
+        self.dysplay.insert(button_text)
