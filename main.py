@@ -1,9 +1,9 @@
 from PySide6.QtWidgets import QApplication
-from main_window import MainWindow
+from layout.main_window import MainWindow
 from PySide6.QtGui import QIcon
 from scripts.variables import ICON_DIR
-from dysplays import Dysplay, Calculations
-from styles.styles import setup_theme
+from layout.dysplays import Dysplay, Calculations
+from layout.styles import setup_theme
 import ctypes
 import sys
 
