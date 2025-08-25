@@ -62,6 +62,7 @@ class Grid(QGridLayout):
                 # mark special buttons
                 if colum not in '0123456789.':
                     button.setProperty('cssClass', 'specialButton')
+                    self.config_special_buttons(button)
 
                 # make '0' span two columns
                 if colum == '0':
@@ -70,11 +71,19 @@ class Grid(QGridLayout):
                     self.addWidget(button, i, j)
 
                 # Custom connection for button click
-                button.clicked.connect(self.dysplay_conection(
+                button.clicked.connect(self.create_slot(
                     self.insert_text_in_layout, button))
 
+    # special button logic
+    def config_special_buttons(self, button):
+        text = button.text()
+
+        if text == 'C':
+            slot = self.create_slot(self.clear)
+            button.clicked.connect(slot)
+
     # Create slot for signal with arguments
-    def dysplay_conection(self, func, *args, **kwargs):
+    def create_slot(self, func, *args, **kwargs):
         @Slot()
         def slot():
             func(*args, **kwargs)
@@ -88,3 +97,7 @@ class Grid(QGridLayout):
         if not valid_num(dysplay_value):
             return
         self.dysplay.insert(button_text)
+
+    # method to receive the clear from "c"
+    def clear(self):
+        self.dysplay.clear()

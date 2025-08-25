@@ -17,7 +17,7 @@ if __name__ == '__main__':
     # create main application
     app = QApplication(sys.argv)
     window = MainWindow()
-
+ 
     # applying dark theme
     setup_theme(app)
 
