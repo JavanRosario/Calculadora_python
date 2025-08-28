@@ -10,5 +10,4 @@ def valid_num(string):
         checked = True
     except ValueError:
         checked = False
-
     return checked

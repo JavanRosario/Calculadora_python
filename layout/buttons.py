@@ -42,7 +42,10 @@ class Grid(QGridLayout):
         self.dysplay = dysplay
         self.info = info
         self._calcs = ''
-        self.calcs = 'teste'
+        self.calcs = ''
+        self._left = None
+        self._right = None
+        self._operator = None
         self.set_grid()
 
     @property
@@ -52,20 +55,21 @@ class Grid(QGridLayout):
     @calcs.setter
     def calcs(self, arg):
         self._calcs = arg
+        self.info.setText(arg)
 
     # setting grid buttons
     def set_grid(self):
         for i, line in enumerate(self.grid_mask):
-            for j, colum in enumerate(line):
-                button = Button(colum)
+            for j, column in enumerate(line):
+                button = Button(column)
 
                 # mark special buttons
-                if colum not in '0123456789.':
+                if column not in '0123456789.':
                     button.setProperty('cssClass', 'specialButton')
                     self.config_special_buttons(button)
 
                 # make '0' span two columns
-                if colum == '0':
+                if column == '0':
                     self.addWidget(button, i, 0, 1, 2)
                 else:
                     self.addWidget(button, i, j)
@@ -80,6 +84,10 @@ class Grid(QGridLayout):
 
         if text == 'C':
             slot = self.create_slot(self.clear)
+            button.clicked.connect(slot)
+
+        if text in '+-/*':
+            slot = self.create_slot(self._operator_clicked, button)
             button.clicked.connect(slot)
 
     # Create slot for signal with arguments
@@ -101,3 +109,25 @@ class Grid(QGridLayout):
     # method to receive the clear from "c"
     def clear(self):
         self.dysplay.clear()
+        self.calcs = ''
+        self._left = None
+        self._right = None
+        self._operator = None
+        self.info.clear()
+
+    # logic for calculation information
+    def _operator_clicked(self, button):
+        text = button.text()
+        dysplay_text = self.dysplay.text()
+        self.dysplay.clear()
+
+        # logic so that when you click on the '+' it doesn't show on the label
+        if not valid_num(dysplay_text) and self._left is None:
+            return
+
+        # left gets a new display text value
+        self._left = int(dysplay_text)
+        # _operator gains a new value, taking the values ​​of '+ - * / '
+        self._operator = text
+        # right after the calcs label prints on the screen
+        self.calcs = f'{self._left}{self._operator}??'
