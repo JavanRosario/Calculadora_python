@@ -5,7 +5,7 @@ from PySide6.QtWidgets import QPushButton, QGridLayout
 from scripts.variables import MEDIUM_FONT
 from PySide6.QtCore import Slot
 from scripts.utils import valid_num
-
+from math import pow
 if TYPE_CHECKING:
     from layout.dysplays import Dysplay
     from main import Infos
@@ -86,7 +86,7 @@ class Grid(QGridLayout):
             slot = self.create_slot(self.clear)
             button.clicked.connect(slot)
 
-        if text in '+-/*':
+        if text in '+-/*^':
             slot = self.create_slot(self._operator_clicked, button)
             button.clicked.connect(slot)
 
@@ -131,7 +131,7 @@ class Grid(QGridLayout):
         # assign left operand only if it's not already set and display is not empty
         if self._left is None and dysplay_text != '':
             # left gets a new display text value
-            self._left = int(dysplay_text)
+            self._left = float(dysplay_text)
 
         # store the selected operator
         self._operator = text
@@ -146,20 +146,38 @@ class Grid(QGridLayout):
             return
 
         # assign right operand
-        self._right = int(dysplay_text)
+        self._right = float(dysplay_text)
         # build the calculation expression as a string
         self.calcs = f'{self._left}{self._operator}{self._right}'
+        result = 'error'
 
         try:
-            # evaluate the expression
-            result = eval(self.calcs)
-        except ZeroDivisionError:
-            # handle division by zero
-            result = ''
+            # check if the operation is exponentiation
+            if '^' in self.calcs and self._left is not None and self._right is not None:
+                result = pow(float(self._left), float(self._right))
+            else:
+                result = eval(self.calcs)
+
+            # round result to 3 decimal places if it's a float
+            if isinstance(result, float):
+                result = round(result, 3)
+
+            # check for extremely large numbers and raise OverflowError
+            if abs(result) > 1e308:
+                raise OverflowError
+        except (ZeroDivisionError, OverflowError):
+            # handle division by zero or overflow
+            result = 'error'
 
         # clear display and show result in info label
         self.dysplay.clear()
         self.info.setText(f'{self.calcs} = {result}')
+
         # prepare for next calculation: store result as new left operand
-        self._left = result
+        if result == 'error':
+            self._left = None
+        else:
+            self._left = result
+
+        # always reset right operand
         self._right = None
