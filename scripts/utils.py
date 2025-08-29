@@ -1,13 +1,23 @@
 import re
 
+# regex to match a single digit or a dot
 NUM_REGEX = re.compile(r'^[0-9.]$')
 
 
 def valid_num(string):
-    checked = False
+
+    # if string is empty, consider it valid
+    if string == '':
+        return True
+    # if string has more than one dot, it's invalid
+    if string.count('.') > 1:
+        return False
+    # if removing the dot results in only digits, it's valid
+    if string.replace('.', '').isdigit():
+        return True
+    # try to convert to float, if possible it's valid
     try:
         float(string)
-        checked = True
+        return True
     except ValueError:
-        checked = False
-    return checked
+        return False

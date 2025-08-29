@@ -55,7 +55,7 @@ class Grid(QGridLayout):
     @calcs.setter
     def calcs(self, arg):
         self._calcs = arg
-        self.info.setText(arg)
+        self.info.setText(arg if arg else '')
 
     # setting grid buttons
     def set_grid(self):
@@ -90,6 +90,9 @@ class Grid(QGridLayout):
             slot = self.create_slot(self._operator_clicked, button)
             button.clicked.connect(slot)
 
+        if text in '=':
+            button.clicked.connect(self._eq)
+
     # Create slot for signal with arguments
     def create_slot(self, func, *args, **kwargs):
         @Slot()
@@ -121,13 +124,42 @@ class Grid(QGridLayout):
         dysplay_text = self.dysplay.text()
         self.dysplay.clear()
 
-        # logic so that when you click on the '+' it doesn't show on the label
+        # if display is not a valid number and no left operand exists, do nothing
         if not valid_num(dysplay_text) and self._left is None:
             return
 
-        # left gets a new display text value
-        self._left = int(dysplay_text)
-        # _operator gains a new value, taking the values ​​of '+ - * / '
+        # assign left operand only if it's not already set and display is not empty
+        if self._left is None and dysplay_text != '':
+            # left gets a new display text value
+            self._left = int(dysplay_text)
+
+        # store the selected operator
         self._operator = text
-        # right after the calcs label prints on the screen
+        # update calculation string with left operand and operator
         self.calcs = f'{self._left}{self._operator}??'
+
+    def _eq(self):
+        dysplay_text = self.dysplay.text()  # get current display text
+
+        # if display is not a valid number, stop execution
+        if not valid_num(dysplay_text):
+            return
+
+        # assign right operand
+        self._right = int(dysplay_text)
+        # build the calculation expression as a string
+        self.calcs = f'{self._left}{self._operator}{self._right}'
+
+        try:
+            # evaluate the expression
+            result = eval(self.calcs)
+        except ZeroDivisionError:
+            # handle division by zero
+            result = ''
+
+        # clear display and show result in info label
+        self.dysplay.clear()
+        self.info.setText(f'{self.calcs} = {result}')
+        # prepare for next calculation: store result as new left operand
+        self._left = result
+        self._right = None
