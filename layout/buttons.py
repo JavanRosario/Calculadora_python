@@ -83,15 +83,23 @@ class Grid(QGridLayout):
         text = button.text()
 
         if text == 'C':
+            # If the button text is "C", create a slot for the "clear" action
             slot = self.create_slot(self.clear)
             button.clicked.connect(slot)
 
         if text in '+-/*^':
+            # If the button text is an operator (+, -, /, *, ^),
+            # create a slot for handling operator clicks
             slot = self.create_slot(self._operator_clicked, button)
             button.clicked.connect(slot)
 
         if text in '=':
+            # If the button text is "=", connect it to the equals function
             button.clicked.connect(self._eq)
+
+        if text in '◀':
+            # If the button text is "◀", connect it to the backspace function of the display
+            button.clicked.connect(self.dysplay.backspace)
 
     # Create slot for signal with arguments
     def create_slot(self, func, *args, **kwargs):
