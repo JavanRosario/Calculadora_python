@@ -30,7 +30,7 @@ if __name__ == '__main__':
     window.add_widget(dysplay)
 
     # add grid layout
-    grid = Grid(dysplay, info)
+    grid = Grid(dysplay, info, window)
     window.window_layout.addLayout(grid)
 
     # set app icon
