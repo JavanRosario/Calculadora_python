@@ -1,5 +1,4 @@
 from typing import TYPE_CHECKING
-from main_window import MainWindow
 from layout.dysplays import Dysplay
 from layout.dysplays import Infos
 from PySide6.QtWidgets import QPushButton, QGridLayout
@@ -8,6 +7,7 @@ from PySide6.QtCore import Slot
 from scripts.utils import valid_num
 from math import pow
 if TYPE_CHECKING:
+    from main_window import MainWindow
     from layout.dysplays import Dysplay
     from main import Infos
 
@@ -25,12 +25,12 @@ class Button(QPushButton):
         font.setBold(True)
         self.setFont(font)
         self.setMinimumSize(50, 50)
-        # self.setProperty('cssClass', 'specialButton')
+        
 
 
 # custom grid layout class
 class Grid(QGridLayout):
-    def __init__(self, dysplay: Dysplay, info: Infos, window: MainWindow, *args, **kwargs):
+    def __init__(self, dysplay: Dysplay, info: Infos, window:"MainWindow", *args, **kwargs):
         super().__init__(*args, **kwargs)
 
         # define grid button layout
@@ -136,7 +136,7 @@ class Grid(QGridLayout):
         self.dysplay.clear()
 
         # if display is not a valid number and no left operand exists, do nothing
-        if not valid_num(dysplay_text) and self._left is None:
+        if not valid_num(dysplay_text) and self._left is None or dysplay_text == '':
             self._show_error('Você não digitou nada')
             return
 
@@ -154,7 +154,8 @@ class Grid(QGridLayout):
         dysplay_text = self.dysplay.text()  # get current display text
 
         # if display is not a valid number, stop execution
-        if not valid_num(dysplay_text):
+        if not valid_num(dysplay_text) or dysplay_text == '':
+            self._show_error('Você não digitou nada')
             return
 
         # assign right operand
@@ -197,4 +198,5 @@ class Grid(QGridLayout):
     def _show_error(self, text):
         msg_box = self.window.msg_box()
         msg_box.setText(text)
+        msg_box.setIcon(msg_box.Icon.Warning)
         msg_box.exec()
