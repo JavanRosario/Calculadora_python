@@ -207,6 +207,8 @@ class Grid(QGridLayout):
         msg_box = self.window.msg_box()
         # Set the text of the message box
         msg_box.setText(text)
+        #setting window error title
+        msg_box.setWindowTitle('Erro na execução')
         # Set the icon to "Critical" to indicate an error
         msg_box.setIcon(msg_box.Icon.Critical)
         # Display the message box
