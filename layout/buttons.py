@@ -12,7 +12,6 @@ if TYPE_CHECKING:
     from main import Infos
 
 
-
 # custom button class
 class Button(QPushButton):
     def __init__(self, *args, **kwargs):
@@ -25,12 +24,11 @@ class Button(QPushButton):
         font.setBold(True)
         self.setFont(font)
         self.setMinimumSize(50, 50)
-        
 
 
 # custom grid layout class
 class Grid(QGridLayout):
-    def __init__(self, dysplay: Dysplay, info: Infos, window:"MainWindow", *args, **kwargs):
+    def __init__(self, dysplay: Dysplay, info: Infos, window: "MainWindow", *args, **kwargs):
         super().__init__(*args, **kwargs)
 
         # define grid button layout
@@ -135,11 +133,6 @@ class Grid(QGridLayout):
         dysplay_text = self.dysplay.text()
         self.dysplay.clear()
 
-        # if display is not a valid number and no left operand exists, do nothing
-        if not valid_num(dysplay_text) and self._left is None or dysplay_text == '':
-            self._show_error('Você não digitou nada')
-            return
-
         # assign left operand only if it's not already set and display is not empty
         if self._left is None and dysplay_text != '':
             # left gets a new display text value
@@ -147,19 +140,32 @@ class Grid(QGridLayout):
 
         # store the selected operator
         self._operator = text
+
         # update calculation string with left operand and operator
         self.calcs = f'{self._left}{self._operator}??'
 
+    # principal calculation method
     def _eq(self):
         dysplay_text = self.dysplay.text()  # get current display text
 
-        # if display is not a valid number, stop execution
-        if not valid_num(dysplay_text) or dysplay_text == '':
-            self._show_error('Você não digitou nada')
+        # Case 1: user pressed "=" without typing anything at all
+        if dysplay_text == '' and self._left is None:
+            self._show_error('Não digitou nada')
+            return
+
+        # Case 2: user already typed a left operand, but didn't type the second number
+        if dysplay_text == '' and self._left is not None:
+            self._show_error('Não digitou o segundo número')
+            return
+
+        # Case 3: user typed something, but it's not a valid number (e.g., "..", "1..2"
+        if not valid_num(dysplay_text):
+            self._show_error('Valor inválido')
             return
 
         # assign right operand
         self._right = float(dysplay_text)
+
         # build the calculation expression as a string
         self.calcs = f'{self._left}{self._operator}{self._right}'
         result = 'error'
@@ -195,8 +201,13 @@ class Grid(QGridLayout):
         # always reset right operand
         self._right = None
 
+    # handling errors with msgbox
     def _show_error(self, text):
+        # Get the message box from the main window
         msg_box = self.window.msg_box()
+        # Set the text of the message box
         msg_box.setText(text)
-        msg_box.setIcon(msg_box.Icon.Warning)
+        # Set the icon to "Critical" to indicate an error
+        msg_box.setIcon(msg_box.Icon.Critical)
+        # Display the message box
         msg_box.exec()
