@@ -3,6 +3,17 @@ import re
 # regex to match a single digit or a dot
 NUM_REGEX = re.compile(r'^[0-9.]$')
 
+def is_num_or_dot(string: str) -> bool:
+    """
+    Check if the input string is a single digit or a dot.
+
+    Args:
+        string (str): Input string to check.
+
+    Returns:
+        bool: True if the string is a single digit or '.', False otherwise.
+    """
+    return bool(NUM_REGEX.search(string))
 
 def valid_num(string):
 
@@ -21,3 +32,16 @@ def valid_num(string):
         return True
     except ValueError:
         return False
+    
+
+def is_empty(string:str):
+    """
+    Check if the input string is empty.
+
+    Args:
+        string (str): Input string to check.
+
+    Returns:
+        bool: True if the string is empty, False otherwise.
+    """
+    return len(string) == 0
