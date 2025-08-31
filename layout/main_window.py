@@ -11,7 +11,7 @@ class MainWindow(QMainWindow):
         self.window_layout = QVBoxLayout()
         self.widget.setLayout(self.window_layout)
         self.setCentralWidget(self.widget)
-        self.setWindowTitle('Calculadora')
+        self.setWindowTitle('Calculadora - Javan')
 
     # lock window size after adjusting
     def fixed_size(self):
