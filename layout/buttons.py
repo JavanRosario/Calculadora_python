@@ -11,27 +11,34 @@ if TYPE_CHECKING:
     from layout.dysplays import Dysplay
     from main import Infos
 
-
-# custom button class
 class Button(QPushButton):
+    """
+    Custom QPushButton with preset font and size.
+    """
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.config_btn_style()
 
     def config_btn_style(self):
+        """Apply font size, bold style, and minimum size to the button."""
         font = self.font()
         font.setPixelSize(MEDIUM_FONT)
         font.setBold(True)
         self.setFont(font)
         self.setMinimumSize(50, 50)
 
-
-# custom grid layout class
 class Grid(QGridLayout):
+    """
+    Custom QGridLayout to manage calculator buttons and logic.
+
+    Attributes:
+        dysplay (Dysplay): Display widget.
+        info (Infos): Info label widget.
+        window (MainWindow): Main application window for error messages.
+    """
     def __init__(self, dysplay: Dysplay, info: Infos, window: "MainWindow", *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        # define grid button layout
         self.grid_mask = [
             ['C', '◀', '^', '/'],
             ['7', '8', '9', '*'],
@@ -51,6 +58,7 @@ class Grid(QGridLayout):
 
     @property
     def calcs(self):
+        """Update the calculation string and display it in the info label."""
         return self._calcs
 
     @calcs.setter
@@ -58,68 +66,72 @@ class Grid(QGridLayout):
         self._calcs = arg
         self.info.setText(arg if arg else '')
 
-    # setting grid buttons
     def set_grid(self):
+        """
+        Set up buttons on the grid and connect signals.
+        """
+        self.dysplay.eq_triggered.connect(self._eq)
+        self.dysplay.backspace_triggered.connect(self.dysplay.backspace)
+        self.dysplay.clear_triggered.connect(self.clear)
+        self.dysplay.input_triggered.connect(self._insert_to_display)
+        self.dysplay.operator_triggered.connect(self._config_left_operator)
+
         for i, line in enumerate(self.grid_mask):
             for j, column in enumerate(line):
                 button = Button(column)
 
-                # mark special buttons
                 if column not in '0123456789.':
                     button.setProperty('cssClass', 'specialButton')
                     self.config_special_buttons(button)
 
-                # make '0' span two columns
                 if column == '0':
                     self.addWidget(button, i, 0, 1, 2)
                 else:
                     self.addWidget(button, i, j)
 
-                # Custom connection for button click
                 button.clicked.connect(self.create_slot(
-                    self.insert_text_in_layout, button))
+                    self._insert_to_display, column))
 
-    # special button logic
     def config_special_buttons(self, button):
+        """Configure the logic for special buttons like operators, clear, backspace, and equals."""
         text = button.text()
 
         if text == 'C':
-            # If the button text is "C", create a slot for the "clear" action
             slot = self.create_slot(self.clear)
             button.clicked.connect(slot)
 
         if text in '+-/*^':
-            # If the button text is an operator (+, -, /, *, ^),
-            # create a slot for handling operator clicks
-            slot = self.create_slot(self._operator_clicked, button)
+            slot = self.create_slot(self._config_left_operator, text)
             button.clicked.connect(slot)
 
-        if text in '=':
-            # If the button text is "=", connect it to the equals function
+        if text == '=':
             button.clicked.connect(self._eq)
 
         if text in '◀':
-            # If the button text is "◀", connect it to the backspace function of the display
             button.clicked.connect(self.dysplay.backspace)
 
-    # Create slot for signal with arguments
     def create_slot(self, func, *args, **kwargs):
+        """Create a Qt Slot to pass arguments to a function."""
         @Slot()
         def slot():
             func(*args, **kwargs)
         return slot
 
-    # Insert button text into display
-    def insert_text_in_layout(self,  button):
-        button_text = button.text()
-        dysplay_value = self.dysplay.text() + button_text
+    @Slot()
+    def _insert_to_display(self,  text):
+        """Insert numeric or dot input into the display if valid."""
+        dysplay_value = self.dysplay.text() + text
 
         if not valid_num(dysplay_value):
             return
-        self.dysplay.insert(button_text)
+        self.dysplay.insert(text)
+
+        self.dysplay.setFocus()
 
     # method to receive the clear from "c"
+    @Slot()
     def clear(self):
+        """Clear the display, info label, and reset calculator state."""
         self.dysplay.clear()
         self.calcs = ''
         self._left = None
@@ -127,89 +139,86 @@ class Grid(QGridLayout):
         self._operator = None
         self.info.clear()
 
-    # logic for calculation information
-    def _operator_clicked(self, button):
-        text = button.text()
+    @Slot() 
+    def _config_left_operator(self, text):
+        """
+        Set the left operand and operator when an operator button is pressed.
+        """
         dysplay_text = self.dysplay.text()
         self.dysplay.clear()
-
-        # assign left operand only if it's not already set and display is not empty
-        if self._left is None and dysplay_text != '':
-            # left gets a new display text value
-            self._left = float(dysplay_text)
-
-        # store the selected operator
-        self._operator = text
-
-        # update calculation string with left operand and operator
-        self.calcs = f'{self._left}{self._operator}??'
-
-    # principal calculation method
-    def _eq(self):
-        dysplay_text = self.dysplay.text()  # get current display text
-
-        # Case 1: user pressed "=" without typing anything at all
+        
         if dysplay_text == '' and self._left is None:
             self._show_error('Não digitou nada')
             return
 
-        # Case 2: user already typed a left operand, but didn't type the second number
+        if self._left is None and dysplay_text != '':
+            self._left = float(dysplay_text)
+        elif self._left is None:
+            self._show_error('Número inválido')
+            return
+
+        # Handle operator input either from button text or string
+        if hasattr(text,'text'):
+            self._operator = text.text()
+        else:
+            self._operator = text
+        self.calcs = f'{self._left}{self._operator}??'
+
+    @Slot()
+    def _eq(self):
+        """
+        Execute the calculation when '=' is pressed.
+        Handles errors like empty input, invalid numbers, division by zero, and overflow.
+        """
+        dysplay_text = self.dysplay.text()  
+
+        if dysplay_text == '' and self._left is None:
+            self._show_error('Não digitou nada')
+            return
+
         if dysplay_text == '' and self._left is not None:
             self._show_error('Não digitou o segundo número')
             return
 
-        # Case 3: user typed something, but it's not a valid number (e.g., "..", "1..2"
         if not valid_num(dysplay_text):
             self._show_error('Valor inválido')
             return
 
-        # assign right operand
         self._right = float(dysplay_text)
 
-        # build the calculation expression as a string
         self.calcs = f'{self._left}{self._operator}{self._right}'
         result = 'error'
 
         try:
-            # check if the operation is exponentiation
             if '^' in self.calcs and self._left is not None and self._right is not None:
                 result = pow(float(self._left), float(self._right))
             else:
                 result = eval(self.calcs)
 
-            # round result to 3 decimal places if it's a float
             if isinstance(result, float):
                 result = round(result, 3)
 
-            # check for extremely large numbers and raise OverflowError
             if abs(result) > 1e308:
-                raise OverflowError
+                self._show_error('Número muito grande! Overflow!')
+        
         except (ZeroDivisionError, OverflowError):
-            # handle division by zero or overflow
+            self._show_error('Não é possível dividir por zero.')
             result = 'error'
 
-        # clear display and show result in info label
         self.dysplay.clear()
         self.info.setText(f'{self.calcs} = {result}')
 
-        # prepare for next calculation: store result as new left operand
         if result == 'error':
             self._left = None
         else:
             self._left = result
 
-        # always reset right operand
         self._right = None
 
-    # handling errors with msgbox
     def _show_error(self, text):
-        # Get the message box from the main window
+        """Display an error message box in the main window."""
         msg_box = self.window.msg_box()
-        # Set the text of the message box
         msg_box.setText(text)
-        #setting window error title
         msg_box.setWindowTitle('Erro na execução')
-        # Set the icon to "Critical" to indicate an error
         msg_box.setIcon(msg_box.Icon.Critical)
-        # Display the message box
         msg_box.exec()
