@@ -1,32 +1,32 @@
 # Calculator
-Desktop calculator built with PySide6 featuring dark theme and full keyboard support.
+Calculadora desktop feita com PySide6 com tema escuro e suporte completo ao teclado.
 
-## Requirements
+## Requisitos
 - Python 3.7+
 - PySide6
 
-Install dependencies:
+Instalar dependências:
 ```
 pip install PySide6
 ```
 
-## Usage
+## Uso
 ```
 python main.py
 ```
 
-## Controls
-**Mouse:** Click buttons  
-**Keyboard shortcuts:**
-- Numbers: `0-9`, `.`
-- Operations: `+`, `-`, `*`, `/`, `^` (or `p`)
-- Execute: `Enter`
-- Clear: `Esc`
-- Delete: `Backspace`
+## Controles
+**Mouse:** Clique nos botões  
+**Atalhos do teclado:**
+- Números: `0-9`, `.`
+- Operações: `+`, `-`, `*`, `/`, `^` (ou `p`)
+- Executar: `Enter`
+- Limpar: `Esc`
+- Apagar: `Backspace`
 
-## Features
-- Basic operations (+, -, *, /)
-- Exponentiation (^)
-- Error handling
-- Dark theme
-- Calculation history
+## Funcionalidades
+- Operações básicas (+, -, *, /)
+- Potenciação (^)
+- Tratamento de erros
+- Tema escuro
+- Histórico de cálculos
