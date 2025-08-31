@@ -45,3 +45,13 @@ def is_empty(string:str):
         bool: True if the string is empty, False otherwise.
     """
     return len(string) == 0
+
+
+
+def convert_to_int(string:str):
+    number = float(string)
+
+    if number.is_integer():
+        number = int(number)
+    
+    return number
