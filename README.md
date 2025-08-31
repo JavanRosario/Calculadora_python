@@ -30,3 +30,4 @@ python main.py
 - Tratamento de erros
 - Tema escuro
 - Histórico de cálculos
+- Transformar número em negativo (botão `N`)
