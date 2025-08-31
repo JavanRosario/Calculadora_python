@@ -119,6 +119,7 @@ class Grid(QGridLayout):
     
     @Slot()
     def _negative_number(self):
+        """Convert the current display number to negative if valid."""
         dysplay_text = self.dysplay.text()
         
         if dysplay_text == '' and self._left is None:

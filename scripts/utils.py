@@ -49,6 +49,7 @@ def is_empty(string:str):
 
 
 def convert_to_int(string:str):
+    """Convert a numeric string to int if whole, else float."""
     number = float(string)
 
     if number.is_integer():
