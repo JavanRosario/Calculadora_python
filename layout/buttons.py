@@ -156,6 +156,7 @@ class Grid(QGridLayout):
         self._right = None
         self._operator = None
         self.info.clear()
+        self.dysplay.setFocus()
 
     @Slot() 
     def _config_left_operator(self, text):
@@ -199,7 +200,7 @@ class Grid(QGridLayout):
             self._show_error('Não digitou o segundo número')
             return
 
-        if not valid_num(dysplay_text):
+        if not valid_num(dysplay_text) or self._left is None:
             self._show_error('Valor inválido')
             return
 
@@ -233,6 +234,7 @@ class Grid(QGridLayout):
             self._left = result
 
         self._right = None
+        self.dysplay.setFocus()
 
     def _show_error(self, text):
         """Display an error message box in the main window."""
@@ -241,3 +243,4 @@ class Grid(QGridLayout):
         msg_box.setWindowTitle('Erro na execução')
         msg_box.setIcon(msg_box.Icon.Critical)
         msg_box.exec()
+        self.dysplay.setFocus()
