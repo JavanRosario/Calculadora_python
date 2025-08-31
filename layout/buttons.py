@@ -4,7 +4,7 @@ from layout.dysplays import Infos
 from PySide6.QtWidgets import QPushButton, QGridLayout
 from scripts.variables import MEDIUM_FONT
 from PySide6.QtCore import Slot
-from scripts.utils import valid_num
+from scripts.utils import valid_num,convert_to_int      
 from math import pow
 if TYPE_CHECKING:
     from main_window import MainWindow
@@ -44,7 +44,7 @@ class Grid(QGridLayout):
             ['7', '8', '9', '*'],
             ['4', '5', '6', '-'],
             ['1', '2', '3', '+'],
-            ['',  '0', '.', '='],
+            ['N',  '0', '.', '='],
         ]
         self.dysplay = dysplay
         self.info = info
@@ -83,11 +83,8 @@ class Grid(QGridLayout):
                 if column not in '0123456789.':
                     button.setProperty('cssClass', 'specialButton')
                     self.config_special_buttons(button)
-
-                if column == '0':
-                    self.addWidget(button, i, 0, 1, 2)
-                else:
-                    self.addWidget(button, i, j)
+                
+                self.addWidget(button ,i,j)
 
                 button.clicked.connect(self.create_slot(
                     self._insert_to_display, column))
@@ -109,6 +106,9 @@ class Grid(QGridLayout):
 
         if text in '◀':
             button.clicked.connect(self.dysplay.backspace)
+        
+        if text in 'N':
+            button.clicked.connect(self._negative_number)
 
     def create_slot(self, func, *args, **kwargs):
         """Create a Qt Slot to pass arguments to a function."""
@@ -116,6 +116,23 @@ class Grid(QGridLayout):
         def slot():
             func(*args, **kwargs)
         return slot
+    
+    @Slot()
+    def _negative_number(self):
+        dysplay_text = self.dysplay.text()
+        
+        if dysplay_text == '' and self._left is None:
+            self._show_error('Não digitou nada')
+            return
+        
+        if not valid_num(dysplay_text):
+            return
+        
+        neg_number = convert_to_int (dysplay_text) * -1
+
+        self.dysplay.setText(str(neg_number))
+
+        self.dysplay.setFocus() 
 
     @Slot()
     def _insert_to_display(self,  text):
@@ -152,7 +169,7 @@ class Grid(QGridLayout):
             return
 
         if self._left is None and dysplay_text != '':
-            self._left = float(dysplay_text)
+            self._left = convert_to_int(dysplay_text)
         elif self._left is None:
             self._show_error('Número inválido')
             return
@@ -163,6 +180,7 @@ class Grid(QGridLayout):
         else:
             self._operator = text
         self.calcs = f'{self._left}{self._operator}??'
+        self.dysplay.setFocus()
 
     @Slot()
     def _eq(self):
@@ -184,18 +202,18 @@ class Grid(QGridLayout):
             self._show_error('Valor inválido')
             return
 
-        self._right = float(dysplay_text)
+        self._right = convert_to_int(dysplay_text)
 
         self.calcs = f'{self._left}{self._operator}{self._right}'
         result = 'error'
 
         try:
             if '^' in self.calcs and self._left is not None and self._right is not None:
-                result = pow(float(self._left), float(self._right))
+                result = pow(convert_to_int(self._left), convert_to_int(self._right))
             else:
                 result = eval(self.calcs)
 
-            if isinstance(result, float):
+            if isinstance(result, (int,float)):
                 result = round(result, 3)
 
             if abs(result) > 1e308:
